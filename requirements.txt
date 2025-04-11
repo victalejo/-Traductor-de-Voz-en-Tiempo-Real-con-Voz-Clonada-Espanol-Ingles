@@ -1,0 +1,21 @@
+gradio==2.2.15
+
+# Reimportar lo necesario tras el reinicio
+import pkg_resources
+
+# Lista de librerías necesarias
+required_packages = [
+    'gradio',
+    'openai-whisper',
+    'deep-translator',
+    'elevenlabs'
+]
+
+# Buscar versiones instaladas
+installed_packages = {pkg.key: pkg.version for pkg in pkg_resources.working_set}
+exact_requirements = [f"{pkg}=={installed_packages[pkg]}" for pkg in required_packages if pkg in installed_packages]
+
+# Guardar en requirements.txt
+with open("/mnt/data/requirements.txt", "w") as f:
+    f.write("\n".join(exact_requirements))
+

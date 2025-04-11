@@ -1,0 +1,119 @@
+![Traductor de voz con IA](./banner.png)
+
+
+# 🧠 Traductor de Voz en Tiempo Real con IA
+
+
+Traductor bidireccional de voz en tiempo real: hablá en español o inglés, escuchá la traducción en el otro idioma con voz realista clonada.
+
+## 🎯 Características principales
+
+- Traducción en tiempo real (Español ↔ Inglés)
+- Transcripción y traducción visible en pantalla
+- Audio traducido con voz natural (usando ElevenLabs)
+- Botón de activación (modo escucha)
+- Interfaz minimalista tipo "modo invisible"
+- Compatible con auriculares Bluetooth
+- Funcionamiento en segundo plano
+- Ejecutable en PC o desde navegador web
+
+---
+
+## 🧰 Tecnologías utilizadas
+
+| Herramienta        | Propósito                                      |
+|--------------------|-----------------------------------------------|
+| Python 3.8+        | Lenguaje principal                             |
+| Gradio             | Crear interfaz web simple                      |
+| Whisper            | Transcripción de voz a texto (OpenAI)         |
+| Deep Translator    | Traducción de texto (GoogleTranslator)         |
+| ElevenLabs         | Generación de voz realista                    |
+
+---
+
+## 🧪 Demo visual de la app
+
+```plaintext
++-------------------------------+
+| [🎙️ ESCUCHAR]                |
+|-------------------------------|
+| 📝 Transcripción:                |
+| "Lo que dijiste en español"    |
+|-------------------------------|
+| 🌐 Traducción:                   |
+| "What you said in English"   |
+|-------------------------------|
+| 🔊 Audio con voz realista       |
+|  [ Reproducir ▶ ]              |
++-------------------------------+
+```
+
+---
+
+## 📦 Instalación y ejecución local
+
+### 1. Clonar el repositorio
+```bash
+git clone https://github.com/mihiriart/traductor-voz-ai.git
+cd traductor-voz-ai
+```
+
+### 2. Instalar dependencias
+Asegurate de tener `Python 3.8+` instalado. Luego ejecutá:
+```bash
+pip install -r requirements.txt
+```
+
+O instalá manualmente:
+```bash
+pip install gradio openai-whisper deep-translator elevenlabs
+```
+
+### 3. Configurar tu API Key de ElevenLabs
+Editá el archivo `app.py` y reemplazá:
+```python
+set_api_key("TU_API_KEY")
+```
+pone tu clave personal de ElevenLabs ([pedila desde https://www.elevenlabs.io]
+
+### 4. Ejecutar la aplicación
+
+```bash
+python app.py
+```
+Se abrirá tu navegador con la app lista para usar.
+
+---
+
+## 📱 Versión web/móvil
+- Si accedés desde tu celular, podés usar el navegador
+- Compatible con modo escritorio o touch
+- Proximamente: empaquetado como APK para Android o como PWA (instalable desde navegador)
+
+---
+
+## 🎧 Recomendaciones de uso
+- Usá auriculares Bluetooth con micrófono para una mejor experiencia
+- El sistema funciona en segundo plano si mantenés la pestaña activa
+- Ideal para entrevistas, reuniones, y entornos laborales en inglés
+
+---
+
+## 🤖 Contribuciones futuras
+- Integración con WebRTC para llamadas en vivo
+- Modo "entrevista" (detectar dos voces por separado)
+- Mejora en detección de idioma automática
+- Historial de conversaciones traducidas
+
+---
+
+## 📩 Contacto
+Hecho por María Inés Hiriart 
+
+Si querés aportar, sugerir mejoras o integrar esta solución a tu trabajo, abrí un issue o escribime a mihiriart74@gmail.com
+
+---
+
+## ⚠️ Licencia
+Este proyecto es experimental y de uso personal. Asegurate de cumplir con los términos de uso de ElevenLabs y otros servicios externos.
+
