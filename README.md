@@ -23,11 +23,12 @@ Traductor bidireccional de voz en tiempo real: hablá en español o inglés, esc
 
 | Herramienta        | Propósito                                      |
 |--------------------|-----------------------------------------------|
-| Python 3.8+        | Lenguaje principal                             |
-| Gradio             | Crear interfaz web simple                      |
-| Whisper            | Transcripción de voz a texto (OpenAI)         |
+| Python 3.9+        | Lenguaje principal                             |
+| Gradio 4+          | Crear interfaz web simple                      |
+| Whisper            | Transcripción de voz a texto (OpenAI)          |
 | Deep Translator    | Traducción de texto (GoogleTranslator)         |
-| ElevenLabs         | Generación de voz realista                    |
+| ElevenLabs SDK 1+  | Generación de voz realista                     |
+| python-dotenv      | Carga de variables de entorno desde `.env`     |
 
 ---
 
@@ -54,34 +55,33 @@ Traductor bidireccional de voz en tiempo real: hablá en español o inglés, esc
 
 ### 1. Clonar el repositorio
 ```bash
-git clone https://github.com/mihiriart/traductor-voz-ai.git
-cd traductor-voz-ai
+git clone https://github.com/victalejo/-Traductor-de-Voz-en-Tiempo-Real-con-Voz-Clonada-Espanol-Ingles.git
+cd -Traductor-de-Voz-en-Tiempo-Real-con-Voz-Clonada-Espanol-Ingles
 ```
 
 ### 2. Instalar dependencias
-Asegurate de tener `Python 3.8+` instalado. Luego ejecutá:
+Asegurate de tener `Python 3.9+` instalado. Luego ejecutá:
 ```bash
 pip install -r requirements.txt
 ```
 
-O instalá manualmente:
+### 3. Configurar tu API Key de ElevenLabs
+Copiá el archivo de ejemplo y completá tu clave personal ([pedila desde https://www.elevenlabs.io](https://www.elevenlabs.io)):
 ```bash
-pip install gradio openai-whisper deep-translator elevenlabs
+cp env.example .env
+# editá .env y pegá tu ELEVENLABS_API_KEY
 ```
 
-### 3. Configurar tu API Key de ElevenLabs
-Editá el archivo `app.py` y reemplazá:
-```python
-set_api_key("TU_API_KEY")
-```
-pone tu clave personal de ElevenLabs ([pedila desde https://www.elevenlabs.io]
+Variables opcionales soportadas en `.env`:
+- `ELEVENLABS_VOICE_ID` — ID de la voz a usar (default: Rachel)
+- `WHISPER_MODEL` — `tiny`, `base`, `small`, `medium` o `large` (default: `base`)
 
 ### 4. Ejecutar la aplicación
 
 ```bash
 python app.py
 ```
-Se abrirá tu navegador con la app lista para usar.
+Se abrirá tu navegador con la app lista para usar. En el selector de idioma, elegí `auto` para que Whisper detecte español o inglés automáticamente.
 
 ---
 
@@ -100,10 +100,12 @@ Se abrirá tu navegador con la app lista para usar.
 ---
 
 ## 🤖 Contribuciones futuras
+- Streaming de audio en chunks para latencia menor (verdadero tiempo real)
+- Cambiar a `faster-whisper` para acelerar la transcripción en CPU
 - Integración con WebRTC para llamadas en vivo
 - Modo "entrevista" (detectar dos voces por separado)
-- Mejora en detección de idioma automática
 - Historial de conversaciones traducidas
+- Tests automáticos y CI
 
 ---
 
@@ -115,5 +117,6 @@ Si querés aportar, sugerir mejoras o integrar esta solución a tu trabajo, abr�
 ---
 
 ## ⚠️ Licencia
-Este proyecto es experimental y de uso personal. Asegurate de cumplir con los términos de uso de ElevenLabs y otros servicios externos.
+Distribuido bajo licencia MIT. Ver [LICENSE](LICENSE) para el texto completo.
+Asegurate igualmente de cumplir con los términos de uso de ElevenLabs y otros servicios externos.
 
