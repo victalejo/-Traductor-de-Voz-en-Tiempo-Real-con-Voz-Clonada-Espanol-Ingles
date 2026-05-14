@@ -25,7 +25,7 @@ Traductor bidireccional de voz en tiempo real: hablá en español o inglés, esc
 |--------------------|-----------------------------------------------|
 | Python 3.9+        | Lenguaje principal                             |
 | Gradio 4+          | Crear interfaz web simple                      |
-| Whisper            | Transcripción de voz a texto (OpenAI)          |
+| faster-whisper     | Transcripción de voz a texto (CTranslate2, 4-5x más rápido en CPU) |
 | Deep Translator    | Traducción de texto (GoogleTranslator)         |
 | ElevenLabs SDK 1+  | Generación de voz realista                     |
 | python-dotenv      | Carga de variables de entorno desde `.env`     |
@@ -74,7 +74,9 @@ cp env.example .env
 
 Variables opcionales soportadas en `.env`:
 - `ELEVENLABS_VOICE_ID` — ID de la voz a usar (default: Rachel)
-- `WHISPER_MODEL` — `tiny`, `base`, `small`, `medium` o `large` (default: `base`)
+- `WHISPER_MODEL` — `tiny`, `base`, `small`, `medium`, `large-v2` o `large-v3` (default: `base`)
+- `WHISPER_DEVICE` — `auto`, `cpu` o `cuda` (default: `auto`)
+- `WHISPER_COMPUTE_TYPE` — `int8`, `float16`, `float32` (default: `int8`; usá `float16` en GPU)
 
 ### 4. Ejecutar la aplicación
 
@@ -101,7 +103,6 @@ Se abrirá tu navegador con la app lista para usar. En el selector de idioma, el
 
 ## 🤖 Contribuciones futuras
 - Streaming de audio en chunks para latencia menor (verdadero tiempo real)
-- Cambiar a `faster-whisper` para acelerar la transcripción en CPU
 - Integración con WebRTC para llamadas en vivo
 - Modo "entrevista" (detectar dos voces por separado)
 - Historial de conversaciones traducidas

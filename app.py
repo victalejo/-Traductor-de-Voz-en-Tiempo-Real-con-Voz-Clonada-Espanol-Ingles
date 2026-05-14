@@ -5,10 +5,10 @@ import time
 from pathlib import Path
 
 import gradio as gr
-import whisper
 from deep_translator import GoogleTranslator
 from dotenv import load_dotenv
 from elevenlabs.client import ElevenLabs
+from faster_whisper import WhisperModel
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -22,13 +22,16 @@ if not ELEVENLABS_API_KEY:
 
 VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID", "21m00Tcm4TlvDq8ikWAM")  # Rachel
 WHISPER_MODEL = os.getenv("WHISPER_MODEL", "base")
+WHISPER_DEVICE = os.getenv("WHISPER_DEVICE", "auto")
+WHISPER_COMPUTE = os.getenv("WHISPER_COMPUTE_TYPE", "int8")
 SUPPORTED_LANGS = {"es", "en"}
 TEMP_DIR = Path(tempfile.gettempdir()) / "traductor_voz_ai"
 TEMP_DIR.mkdir(exist_ok=True)
-TEMP_TTL_SECONDS = 3600  # files older than 1h are removed on the next call
+TEMP_TTL_SECONDS = 3600
 
 client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
-model = whisper.load_model(WHISPER_MODEL)
+log.info("Cargando Whisper '%s' (device=%s, compute=%s)", WHISPER_MODEL, WHISPER_DEVICE, WHISPER_COMPUTE)
+model = WhisperModel(WHISPER_MODEL, device=WHISPER_DEVICE, compute_type=WHISPER_COMPUTE)
 
 
 def _cleanup_old_temp_files() -> None:
@@ -41,24 +44,16 @@ def _cleanup_old_temp_files() -> None:
             pass
 
 
-def _detect_or_use(audio_path: str, idioma_entrada: str) -> tuple[str, str]:
-    """Returns (input_lang, transcribed_text). Falls back to manual choice if auto fails."""
-    if idioma_entrada != "auto":
-        result = model.transcribe(audio_path, language=idioma_entrada)
-        return idioma_entrada, result["text"].strip()
-
-    # Whisper's auto detection: load 30s, detect language, then transcribe
-    audio = whisper.load_audio(audio_path)
-    audio = whisper.pad_or_trim(audio)
-    mel = whisper.log_mel_spectrogram(audio).to(model.device)
-    _, probs = model.detect_language(mel)
-    detected = max(probs, key=probs.get)
+def _transcribe(audio_path: str, idioma_entrada: str) -> tuple[str, str]:
+    """Returns (detected_language, text)."""
+    lang = None if idioma_entrada == "auto" else idioma_entrada
+    segments, info = model.transcribe(audio_path, language=lang, vad_filter=True)
+    texto = " ".join(seg.text for seg in segments).strip()
+    detected = info.language if lang is None else lang
     if detected not in SUPPORTED_LANGS:
-        # Default to español if Whisper detected something we don't translate
         log.warning("Idioma detectado '%s' no soportado, usando 'es'", detected)
         detected = "es"
-    result = model.transcribe(audio_path, language=detected)
-    return detected, result["text"].strip()
+    return detected, texto
 
 
 def traducir(audio_path: str, idioma_entrada: str):
@@ -68,7 +63,7 @@ def traducir(audio_path: str, idioma_entrada: str):
     _cleanup_old_temp_files()
 
     try:
-        idioma_in, texto = _detect_or_use(audio_path, idioma_entrada)
+        idioma_in, texto = _transcribe(audio_path, idioma_entrada)
     except Exception as e:
         log.exception("Error en transcripción")
         raise gr.Error(f"No pude transcribir el audio: {e}") from e
