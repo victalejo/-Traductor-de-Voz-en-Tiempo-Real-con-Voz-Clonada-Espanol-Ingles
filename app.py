@@ -1,49 +1,62 @@
+import os
+import tempfile
 
 import gradio as gr
 import whisper
-import tempfile
 from deep_translator import GoogleTranslator
-from elevenlabs import generate, set_api_key
+from dotenv import load_dotenv
+from elevenlabs.client import ElevenLabs
 
-# CONFIG
-set_api_key("TU_API_KEY")  # Reemplazar con tu API de ElevenLabs
-VOICE_NAME = "Rachel"  # Voz de prueba de ElevenLabs
-model = whisper.load_model("base")
+load_dotenv()
 
-# FUNCIONES
-def traducir(audio, idioma_entrada):
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as f:
-        f.write(audio)
-        temp_audio_path = f.name
+ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
+if not ELEVENLABS_API_KEY:
+    raise RuntimeError(
+        "Falta ELEVENLABS_API_KEY. Copiá env.example a .env y configurá tu clave."
+    )
 
-    texto = model.transcribe(temp_audio_path, language=idioma_entrada)["text"]
+VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID", "21m00Tcm4TlvDq8ikWAM")  # Rachel
+WHISPER_MODEL = os.getenv("WHISPER_MODEL", "base")
+
+client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
+model = whisper.load_model(WHISPER_MODEL)
+
+
+def traducir(audio_path: str, idioma_entrada: str):
+    if not audio_path:
+        return "", "", None
+
+    texto = model.transcribe(audio_path, language=idioma_entrada)["text"].strip()
     idioma_salida = "en" if idioma_entrada == "es" else "es"
     traduccion = GoogleTranslator(source=idioma_entrada, target=idioma_salida).translate(texto)
 
-    audio_out = generate(
+    audio_stream = client.text_to_speech.convert(
         text=traduccion,
-        voice=VOICE_NAME,
-        model="eleven_multilingual_v2"
+        voice_id=VOICE_ID,
+        model_id="eleven_multilingual_v2",
     )
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as out_file:
-        out_file.write(audio_out)
+        for chunk in audio_stream:
+            if chunk:
+                out_file.write(chunk)
         return texto, traduccion, out_file.name
 
-# INTERFAZ
+
 interface = gr.Interface(
     fn=traducir,
     inputs=[
-        gr.Audio(source="microphone", type="binary", label="🎙️ Hablá aquí"),
-        gr.Radio(["es", "en"], label="Idioma que estás hablando", value="es")
+        gr.Audio(sources=["microphone"], type="filepath", label="🎙️ Hablá aquí"),
+        gr.Radio(["es", "en"], label="Idioma que estás hablando", value="es"),
     ],
     outputs=[
         gr.Textbox(label="📝 Transcripción"),
         gr.Textbox(label="🌐 Traducción"),
-        gr.Audio(label="🔊 Traducción hablada")
+        gr.Audio(label="🔊 Traducción hablada"),
     ],
     title="Asistente Bilingüe en Tiempo Real 🌍",
-    description="Hablá en español o inglés. Escuchá la traducción con voz realista al instante."
+    description="Hablá en español o inglés. Escuchá la traducción con voz realista al instante.",
 )
 
-interface.launch()
+if __name__ == "__main__":
+    interface.launch()
