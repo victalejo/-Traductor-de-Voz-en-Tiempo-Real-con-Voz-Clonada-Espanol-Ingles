@@ -85,6 +85,29 @@ python app.py
 ```
 Se abrirá tu navegador con la app lista para usar. En el selector de idioma, elegí `auto` para que Whisper detecte español o inglés automáticamente.
 
+La interfaz tiene dos pestañas:
+- **🎤 Push-to-talk** — grabás, clickeás "Traducir" y obtenés transcripción + traducción + audio sintetizado.
+- **📡 Modo continuo** — la transcripción se actualiza en vivo a medida que hablás (sin TTS, para latencia mínima).
+
+---
+
+## 🧪 Desarrollo y tests
+
+Instalá las dependencias de dev:
+```bash
+pip install -r requirements-dev.txt
+```
+
+Correr el linter y los tests:
+```bash
+ruff check .
+pytest
+```
+
+Los tests usan stubs (ver [tests/conftest.py](tests/conftest.py)) para evitar descargar el modelo Whisper o llamar a ElevenLabs durante CI.
+
+CI corre automáticamente en cada push/PR vía GitHub Actions ([.github/workflows/ci.yml](.github/workflows/ci.yml)).
+
 ---
 
 ## 📱 Versión web/móvil
@@ -102,11 +125,11 @@ Se abrirá tu navegador con la app lista para usar. En el selector de idioma, el
 ---
 
 ## 🤖 Contribuciones futuras
-- Streaming de audio en chunks para latencia menor (verdadero tiempo real)
+- Síntesis de voz (TTS) también en streaming para verdadera baja latencia end-to-end
 - Integración con WebRTC para llamadas en vivo
 - Modo "entrevista" (detectar dos voces por separado)
 - Historial de conversaciones traducidas
-- Tests automáticos y CI
+- Clonado real de voz del usuario (subiendo muestra a ElevenLabs)
 
 ---
 
